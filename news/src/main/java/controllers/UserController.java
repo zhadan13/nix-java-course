@@ -1,51 +1,18 @@
 package controllers;
 
 import connection.ConnectionFactory;
-import dao.UserDao;
+import dao.Dao;
 import models.User;
 
 import java.sql.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
-public class UserController implements UserDao {
-    public User getUserById(final Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM USER WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return createUser(resultSet);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public boolean deleteUserById(final Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "DELETE FROM USER WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
-            preparedStatement.setLong(1, id);
-
-            int executeUpdateResult = preparedStatement.executeUpdate();
-
-            if (executeUpdateResult == 1) {
-                return true;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public boolean insertUser(final User user) {
-        if (getAllUsers().stream().anyMatch(user1 -> user1.getId().equals(user.getId()))) {
+public class UserController implements Dao<User> {
+    @Override
+    public boolean save(User user) {
+        if (getAll().stream().anyMatch(user1 -> user1.getId().equals(user.getId()))) {
             throw new RuntimeException("ID error!");
         }
         try (Connection connection = ConnectionFactory.getConnection()) {
@@ -69,7 +36,27 @@ public class UserController implements UserDao {
         return false;
     }
 
-    public boolean updateUser(final User user) {
+    @Override
+    public boolean delete(Long id) {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sqlString = "DELETE FROM USER WHERE ID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+            preparedStatement.setLong(1, id);
+
+            int executeUpdateResult = preparedStatement.executeUpdate();
+
+            if (executeUpdateResult == 1) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean update(User user) {
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sqlString = "UPDATE USER SET NAME = ?, PASSWORD = ?, AGE = ?, EMAIL = ? WHERE ID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
@@ -91,7 +78,31 @@ public class UserController implements UserDao {
         return false;
     }
 
-    public Set<User> getAllUsers() {
+    @Override
+    public Optional<User> get(User user) {
+        return getById(user.getId());
+    }
+
+    @Override
+    public Optional<User> getById(Long id) {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sqlString = "SELECT * FROM USER WHERE ID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return Optional.of(createUser(resultSet));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Set<User> getAll() {
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sqlString = "SELECT * FROM USER";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
@@ -104,24 +115,6 @@ public class UserController implements UserDao {
             }
 
             return users;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public User getUserByUserNameAndPassword(final String name, final String password) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM USER WHERE NAME = ? AND PASSWORD = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, password);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return createUser(resultSet);
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

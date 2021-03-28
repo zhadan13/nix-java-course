@@ -1,69 +1,18 @@
 package controllers;
 
 import connection.ConnectionFactory;
-import dao.PostDao;
+import dao.Dao;
 import models.Post;
 import models.User;
 
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.sql.Date;
+import java.util.*;
 
-public class PostController implements PostDao {
-    public Post getPostById(final Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM NEWS WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return createPost(resultSet);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public Post getPostByTitle(final String title) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM NEWS WHERE TITLE = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
-            preparedStatement.setString(1, title);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return createPost(resultSet);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public boolean deletePostById(final Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "DELETE FROM NEWS WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
-            preparedStatement.setLong(1, id);
-
-            int executeUpdateResult = preparedStatement.executeUpdate();
-
-            if (executeUpdateResult == 1) {
-                return true;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public boolean insertPost(final Post post) {
-        if (getAllPosts().stream().anyMatch(post1 -> post1.getId().equals(post.getId()))) {
+public class PostController implements Dao<Post> {
+    @Override
+    public boolean save(Post post) {
+        if (getAll().stream().anyMatch(post1 -> post1.getId().equals(post.getId()))) {
             throw new RuntimeException("ID error!");
         }
         try (Connection connection = ConnectionFactory.getConnection()) {
@@ -88,7 +37,27 @@ public class PostController implements PostDao {
         return false;
     }
 
-    public boolean updatePost(final Post post) {
+    @Override
+    public boolean delete(Long id) {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sqlString = "DELETE FROM NEWS WHERE ID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+            preparedStatement.setLong(1, id);
+
+            int executeUpdateResult = preparedStatement.executeUpdate();
+
+            if (executeUpdateResult == 1) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean update(Post post) {
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sqlString = "UPDATE NEWS SET TITLE = ?, TEXT = ?, DATE = ?, VIEWS = ?, AUTHOR_ID = ? WHERE ID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
@@ -111,15 +80,39 @@ public class PostController implements PostDao {
         return false;
     }
 
-    public Set<Post> getAllPosts() {
+    @Override
+    public Optional<Post> get(Post post) {
+        return getById(post.getId());
+    }
+
+    @Override
+    public Optional<Post> getById(Long id) {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sqlString = "SELECT * FROM NEWS WHERE ID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return createPost(resultSet);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Post> getAll() {
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sqlString = "SELECT * FROM NEWS";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            Set<Post> posts = new HashSet<>();
+            List<Post> posts = new ArrayList<>();
             while (resultSet.next()) {
-                Post post = createPost(resultSet);
+                Post post = createPost(resultSet).orElse(null);
                 posts.add(post);
             }
 
@@ -131,7 +124,7 @@ public class PostController implements PostDao {
         return null;
     }
 
-    public User getPostAuthor(final Long id) {
+    public Optional<User> getPostAuthor(final Long id) {
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sqlString = "SELECT * FROM NEWS WHERE ID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
@@ -139,23 +132,23 @@ public class PostController implements PostDao {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return new UserController().getUserById(resultSet.getLong("author_id"));
+                return new UserController().getById(resultSet.getLong("author_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return Optional.empty();
     }
 
-    private static Post createPost(final ResultSet resultSet) throws SQLException {
+    private static Optional<Post> createPost(final ResultSet resultSet) throws SQLException {
         Post post = new Post();
         post.setId(resultSet.getLong("id"));
         post.setTitle(resultSet.getString("title"));
         post.setText(resultSet.getString("text"));
         post.setDate(resultSet.getDate("date").toLocalDate());
         post.setViews(resultSet.getInt("views"));
-        post.setAuthor(new UserController().getUserById(resultSet.getLong("author_id")));
-        return post;
+        post.setAuthor(new UserController().getById(resultSet.getLong("author_id")).orElse(null));
+        return Optional.of(post);
     }
 }
