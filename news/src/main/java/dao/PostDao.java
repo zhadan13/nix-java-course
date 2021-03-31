@@ -1,7 +1,5 @@
-package controllers;
+package dao;
 
-import connection.ConnectionFactory;
-import dao.Dao;
 import models.Post;
 import models.User;
 
@@ -9,15 +7,15 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
-public class PostController implements Dao<Post> {
+public class PostDao implements Dao<Post> {
     @Override
     public boolean save(Post post) {
         if (getAll().stream().anyMatch(post1 -> post1.getId().equals(post.getId()))) {
             throw new RuntimeException("ID error!");
         }
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "INSERT INTO NEWS VALUES (?, ?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("INSERT INTO NEWS VALUES (?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setLong(1, post.getId());
             preparedStatement.setString(2, post.getTitle());
             preparedStatement.setString(3, post.getText());
@@ -31,7 +29,7 @@ public class PostController implements Dao<Post> {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in save method", e);
         }
 
         return false;
@@ -39,9 +37,9 @@ public class PostController implements Dao<Post> {
 
     @Override
     public boolean delete(Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "DELETE FROM NEWS WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("DELETE FROM NEWS WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
 
             int executeUpdateResult = preparedStatement.executeUpdate();
@@ -50,7 +48,7 @@ public class PostController implements Dao<Post> {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in delete method", e);
         }
 
         return false;
@@ -58,9 +56,9 @@ public class PostController implements Dao<Post> {
 
     @Override
     public boolean update(Post post) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "UPDATE NEWS SET TITLE = ?, TEXT = ?, DATE = ?, VIEWS = ?, AUTHOR_ID = ? WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("UPDATE NEWS SET TITLE = ?, TEXT = ?, DATE = ?, VIEWS = ?, AUTHOR_ID = ? WHERE ID = ?")) {
             preparedStatement.setString(1, post.getTitle());
             preparedStatement.setString(2, post.getText());
             preparedStatement.setDate(3, Date.valueOf(post.getDate()));
@@ -74,7 +72,7 @@ public class PostController implements Dao<Post> {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in update method", e);
         }
 
         return false;
@@ -87,9 +85,9 @@ public class PostController implements Dao<Post> {
 
     @Override
     public Optional<Post> getById(Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM NEWS WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("SELECT * FROM NEWS WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -97,7 +95,7 @@ public class PostController implements Dao<Post> {
                 return createPost(resultSet);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in getById method", e);
         }
 
         return Optional.empty();
@@ -105,9 +103,8 @@ public class PostController implements Dao<Post> {
 
     @Override
     public List<Post> getAll() {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM NEWS";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM NEWS")) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<Post> posts = new ArrayList<>();
@@ -118,24 +115,22 @@ public class PostController implements Dao<Post> {
 
             return posts;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in getAll method", e);
         }
-
-        return null;
     }
 
     public Optional<User> getPostAuthor(final Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM NEWS WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("SELECT * FROM NEWS WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return new UserController().getById(resultSet.getLong("author_id"));
+                return new UserDao().getById(resultSet.getLong("author_id"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in getPostAuthor method", e);
         }
 
         return Optional.empty();
@@ -148,7 +143,7 @@ public class PostController implements Dao<Post> {
         post.setText(resultSet.getString("text"));
         post.setDate(resultSet.getDate("date").toLocalDate());
         post.setViews(resultSet.getInt("views"));
-        post.setAuthor(new UserController().getById(resultSet.getLong("author_id")).orElse(null));
+        post.setAuthor(new UserDao().getById(resultSet.getLong("author_id")).orElse(null));
         return Optional.of(post);
     }
 }

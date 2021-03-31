@@ -1,7 +1,5 @@
-package controllers;
+package dao;
 
-import connection.ConnectionFactory;
-import dao.Dao;
 import models.User;
 
 import java.sql.*;
@@ -9,15 +7,15 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class UserController implements Dao<User> {
+public class UserDao implements Dao<User> {
     @Override
     public boolean save(User user) {
         if (getAll().stream().anyMatch(user1 -> user1.getId().equals(user.getId()))) {
             throw new RuntimeException("ID error!");
         }
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "INSERT INTO USER VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("INSERT INTO USER VALUES (?, ?, ?, ?, ?)")) {
             preparedStatement.setLong(1, user.getId());
             preparedStatement.setString(2, user.getName());
             preparedStatement.setString(3, user.getPassword());
@@ -30,7 +28,7 @@ public class UserController implements Dao<User> {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in save method", e);
         }
 
         return false;
@@ -38,9 +36,9 @@ public class UserController implements Dao<User> {
 
     @Override
     public boolean delete(Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "DELETE FROM USER WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("DELETE FROM USER WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
 
             int executeUpdateResult = preparedStatement.executeUpdate();
@@ -49,7 +47,7 @@ public class UserController implements Dao<User> {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in delete method", e);
         }
 
         return false;
@@ -57,9 +55,9 @@ public class UserController implements Dao<User> {
 
     @Override
     public boolean update(User user) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "UPDATE USER SET NAME = ?, PASSWORD = ?, AGE = ?, EMAIL = ? WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("UPDATE USER SET NAME = ?, PASSWORD = ?, AGE = ?, EMAIL = ? WHERE ID = ?")) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setInt(3, user.getAge());
@@ -72,7 +70,7 @@ public class UserController implements Dao<User> {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in update method", e);
         }
 
         return false;
@@ -85,9 +83,9 @@ public class UserController implements Dao<User> {
 
     @Override
     public Optional<User> getById(Long id) {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM USER WHERE ID = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement("SELECT * FROM USER WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -95,7 +93,7 @@ public class UserController implements Dao<User> {
                 return Optional.of(createUser(resultSet));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in getById method", e);
         }
 
         return Optional.empty();
@@ -103,9 +101,8 @@ public class UserController implements Dao<User> {
 
     @Override
     public Set<User> getAll() {
-        try (Connection connection = ConnectionFactory.getConnection()) {
-            String sqlString = "SELECT * FROM USER";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM USER")) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             Set<User> users = new HashSet<>();
@@ -116,10 +113,8 @@ public class UserController implements Dao<User> {
 
             return users;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error in getAll method", e);
         }
-
-        return null;
     }
 
     private static User createUser(final ResultSet resultSet) throws SQLException {
