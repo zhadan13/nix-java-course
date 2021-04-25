@@ -7,9 +7,9 @@ import java.time.LocalDate;
 
 public class NewsApplication {
     public static void main(String[] args) {
-        User user = new User(0L, "Artem", "asdfghj", 21, "artem@yahoo.com");
+        // User user = new User(0L, "Artem", "asdfghj", 21, "artem@yahoo.com");
 
-        UserDao userDao = new UserDao();
+        // UserDao userDao = new UserDao();
         // userDao.save(new User(0L, "ABC", "asdfghjkl", 10, "abc@google.com"));
         // userDao.save(new User(1L, "DEF", "fdsbfdisb", 112, "DEF@google.com"));
         // userDao.save(new User(2L, "AQQD", "sdsdascascscasc", 111, "no@google.com"));
@@ -20,7 +20,7 @@ public class NewsApplication {
         // System.out.println(user1);
         // System.out.println(userDao.getAll());
 
-        PostDao postDao = new PostDao();
+        // PostDao postDao = new PostDao();
         // postDao.save(new Post(0L, "Apple post", "New post ...", LocalDate.now(), 100, user));
         // postDao.save(new Post(1L, "Hello World!", "New post ...", LocalDate.now(), 210, user));
         // postDao.save(new Post(2L, "Hello World2", "New post ...", LocalDate.now(), 210, user));
