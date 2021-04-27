@@ -1,5 +1,3 @@
-<%@ page import="models.Post" %>
-<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
@@ -47,7 +45,7 @@
                     </a>
                     <a class="p-2 text-dark" href="/news">Home</a>
                     <a class="p-2 text-dark" href="/news/blog">Blog</a>
-                    <a class="p-2 text-dark" href="/news/addPost">Add article</a>
+                    <a class="p-2 text-dark" href="/news/blog/add">Add article</a>
                     <a class="p-2 text-dark" href="/about">About</a>
                 </nav>
             </div>
@@ -55,25 +53,20 @@
     </div>
 </header>
 
-<div class="container mt-5">
-    <h1>Blog</h1><br>
-    <div class="alert alert-info mt-2">
-        <%
-            List<Post> posts = (List<Post>) request.getAttribute("posts");
-            if (posts == null || posts.size() == 0) { %>
-        <p>So far it's empty.</p>
-        <%
-        } else {
-            for (Post post : posts) {
-        %>
-        <h3 th:text= <%=post.getTitle()%>></h3>
-        <p th:text=<%=post.getDate()%>></p>
-        <a th:href="'/blog/' + '1'" class="btn btn-success">Details</a>
-        <%
-                }
-            }
-        %>
-    </div>
+<div class="container mt-5 mb-5">
+    <h1>Add new article</h1><br>
+    <form action="addPostServlet" method="post">
+        <label>
+            <input type="text" name="title" placeholder="Enter article title" class="form-control">
+        </label><br>
+        <label>
+            <input type="text" name="date" placeholder="Enter anons" class="form-control">
+        </label><br>
+        <label>
+            <textarea name="text" placeholder="Enter article text" class="form-control"></textarea>
+        </label><br>
+        <button type="submit" class="btn btn-success" th:href="blog.jsp">Add article</button>
+    </form>
 </div>
 
 <footer>

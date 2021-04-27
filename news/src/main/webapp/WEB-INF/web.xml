@@ -12,4 +12,13 @@
         <servlet-name>blog</servlet-name>
         <url-pattern>/blog</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>addPostServlet</servlet-name>
+        <servlet-class>servlets.AddPostServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>addPostServlet</servlet-name>
+        <url-pattern>/addPost</url-pattern>
+    </servlet-mapping>
 </web-app>
