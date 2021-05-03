@@ -15,7 +15,7 @@ public class UserDao implements Dao<User> {
         }
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("INSERT INTO USER VALUES (?, ?, ?, ?, ?)")) {
+                     .prepareStatement("INSERT INTO users1 VALUES (?, ?, ?, ?, ?)")) {
             preparedStatement.setLong(1, user.getId());
             preparedStatement.setString(2, user.getName());
             preparedStatement.setString(3, user.getPassword());
@@ -38,7 +38,7 @@ public class UserDao implements Dao<User> {
     public boolean delete(Long id) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("DELETE FROM USER WHERE ID = ?")) {
+                     .prepareStatement("DELETE FROM users1 WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
 
             int executeUpdateResult = preparedStatement.executeUpdate();
@@ -57,7 +57,7 @@ public class UserDao implements Dao<User> {
     public boolean update(User user) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("UPDATE USER SET NAME = ?, PASSWORD = ?, AGE = ?, EMAIL = ? WHERE ID = ?")) {
+                     .prepareStatement("UPDATE users1 SET NAME = ?, PASSWORD = ?, AGE = ?, EMAIL = ? WHERE ID = ?")) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setInt(3, user.getAge());
@@ -85,7 +85,7 @@ public class UserDao implements Dao<User> {
     public Optional<User> getById(Long id) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("SELECT * FROM USER WHERE ID = ?")) {
+                     .prepareStatement("SELECT * FROM users1 WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -102,7 +102,7 @@ public class UserDao implements Dao<User> {
     @Override
     public Set<User> getAll() {
         try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM USER")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users1")) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             Set<User> users = new HashSet<>();

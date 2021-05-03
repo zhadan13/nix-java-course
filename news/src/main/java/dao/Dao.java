@@ -20,8 +20,8 @@ public interface Dao<T> {
     Collection<T> getAll();
 
     default Connection getConnection() {
-        final String URL = "jdbc:h2:~/test";
-        final String USER = "artem";
+        final String URL = "jdbc:postgresql://localhost:5432/news";
+        final String USER = "postgres";
         final String PASSWORD = "12345678";
         try {
             return DriverManager.getConnection(URL, USER, PASSWORD);

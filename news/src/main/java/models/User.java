@@ -1,11 +1,25 @@
 package models;
 
+import javax.persistence.*;
+
+@Entity(name = "User")
+@Table(name = "users1")
 public class User {
 
-    private Long id; // TODO: Generate value
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column
     private String name;
+
+    @Column
     private String password;
+
+    @Column
     private Integer age;
+
+    @Column
     private String email;
 
     public User() {

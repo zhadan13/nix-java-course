@@ -30,7 +30,7 @@ public class AddPostServlet extends HttpServlet {
         // SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
         // DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder().toFormatter(Locale.US);
         Post post = new Post((long) new SecureRandom().nextInt(), title, text, LocalDate.parse(date), 0,
-                new User((long) new SecureRandom().nextInt(), "Artem", "artem@google.com"));
+                new User((long) new SecureRandom().nextInt(), "Artem", "artem@google.com"), 1L);
         boolean result = postDao.save(post);
         // System.out.println(result);
         RequestDispatcher view = req.getRequestDispatcher("jsp/blog.jsp");

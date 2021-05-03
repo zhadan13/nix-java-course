@@ -15,7 +15,7 @@ public class PostDao implements Dao<Post> {
         }
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("INSERT INTO NEWS VALUES (?, ?, ?, ?, ?, ?)")) {
+                     .prepareStatement("INSERT INTO news1 VALUES (?, ?, ?, ?, ?, ?)")) {
             preparedStatement.setLong(1, post.getId());
             preparedStatement.setString(2, post.getTitle());
             preparedStatement.setString(3, post.getText());
@@ -39,7 +39,7 @@ public class PostDao implements Dao<Post> {
     public boolean delete(Long id) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("DELETE FROM NEWS WHERE ID = ?")) {
+                     .prepareStatement("DELETE FROM news1 WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
 
             int executeUpdateResult = preparedStatement.executeUpdate();
@@ -58,7 +58,7 @@ public class PostDao implements Dao<Post> {
     public boolean update(Post post) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("UPDATE NEWS SET TITLE = ?, TEXT = ?, DATE = ?, VIEWS = ?, AUTHOR_ID = ? WHERE ID = ?")) {
+                     .prepareStatement("UPDATE news1 SET TITLE = ?, TEXT = ?, DATE = ?, VIEWS = ?, AUTHOR_ID = ? WHERE ID = ?")) {
             preparedStatement.setString(1, post.getTitle());
             preparedStatement.setString(2, post.getText());
             preparedStatement.setDate(3, Date.valueOf(post.getDate()));
@@ -87,7 +87,7 @@ public class PostDao implements Dao<Post> {
     public Optional<Post> getById(Long id) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("SELECT * FROM NEWS WHERE ID = ?")) {
+                     .prepareStatement("SELECT * FROM news1 WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -104,7 +104,7 @@ public class PostDao implements Dao<Post> {
     @Override
     public List<Post> getAll() {
         try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM NEWS")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM news1")) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<Post> posts = new ArrayList<>();
@@ -122,7 +122,7 @@ public class PostDao implements Dao<Post> {
     public Optional<User> getPostAuthor(final Long id) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("SELECT * FROM NEWS WHERE ID = ?")) {
+                     .prepareStatement("SELECT * FROM news1 WHERE ID = ?")) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 

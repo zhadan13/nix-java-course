@@ -1,34 +1,62 @@
 package models;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity(name = "Post")
+@Table(name = "news1")
 public class Post {
 
-    private Long id; // TODO: Generate value
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column
     private String title;
+
+    @Column
     private String text;
+
+    @Column
     private LocalDate date;
+
+    @Column
     private Integer views;
+
+    @Transient
     private User author;
+
+    @Column
+    private Long authorId;
 
     public Post() {
     }
 
-    public Post(String title, String text, LocalDate date, Integer views, User author) {
+    public Post(String title, String text, LocalDate date, Integer views, Long authorId) {
+        this.title = title;
+        this.text = text;
+        this.date = date;
+        this.views = views;
+        this.authorId = authorId;
+    }
+
+    public Post(String title, String text, LocalDate date, Integer views, User author, Long authorId) {
         this.title = title;
         this.text = text;
         this.date = date;
         this.views = views;
         this.author = author;
+        this.authorId = authorId;
     }
 
-    public Post(Long id, String title, String text, LocalDate date, Integer views, User author) {
+    public Post(Long id, String title, String text, LocalDate date, Integer views, User author, Long authorId) {
         this.id = id;
         this.title = title;
         this.text = text;
         this.date = date;
         this.views = views;
         this.author = author;
+        this.authorId = authorId;
     }
 
     public Long getId() {
@@ -79,15 +107,23 @@ public class Post {
         this.author = author;
     }
 
+    public Long getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
+    }
+
     @Override
     public String toString() {
-        return "Post {" +
+        return "Post { " +
                 "id = " + id +
                 ", title = '" + title + '\'' +
                 ", text = '" + text + '\'' +
                 ", date = " + date +
                 ", views = " + views +
-                ", author = " + (author == null ? "can't find author" : author.toString()) +
-                '}' + '\'';
+                ", authorId = " + authorId +
+                '}';
     }
 }
