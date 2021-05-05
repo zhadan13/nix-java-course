@@ -10,7 +10,7 @@ CREATE TABLE users1
 
 CREATE TABLE news1
 (
-    id        BIGINT  NOT NULL,
+    id        BIGINT  NOT NULL GENERATED ALWAYS AS IDENTITY,
     title     VARCHAR NOT NULL,
     text      VARCHAR NOT NULL,
     date      VARCHAR NOT NULL,

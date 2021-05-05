@@ -9,8 +9,17 @@ public class NewsApplication {
     public static void main(String[] args) {
         // User user = new User(0L, "Artem", "asdfghj", 21, "artem@yahoo.com");
 
-        // UserDao userDao = new UserDao();
-        // userDao.save(new User(0L, "ABC", "asdfghjkl", 10, "abc@google.com"));
+        /*
+        UserDao userDao = new UserDao();
+        System.out.println(userDao.getAll());
+        PostDao postDao = new PostDao();
+        System.out.println(postDao.getAll());
+        User user = new User("ABC", "asdfghjkl", 10, "abcde@google.com");
+        userDao.save(user);
+        postDao.save(new Post("post1", "text1", LocalDate.now(), 0, user.getId()));
+        System.out.println(userDao.getAll());
+        System.out.println(postDao.getAll());*/
+
         // userDao.save(new User(1L, "DEF", "fdsbfdisb", 112, "DEF@google.com"));
         // userDao.save(new User(2L, "AQQD", "sdsdascascscasc", 111, "no@google.com"));
         // userDao.save(new User(3L, "AQQD", "sdsdascascscasc", 111, "no@google.com"));

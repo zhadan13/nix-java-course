@@ -20,7 +20,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
         <datasource-mapping>
-          <factory-entry name="news" value="2ab3dadd-97f4-4e6f-bccc-49a74037c3d0" />
+          <factory-entry name="news" value="83c611ea-74cb-4e00-8dcb-589db8cae1cf" />
         </datasource-mapping>
         <naming-strategy-map />
       </configuration>

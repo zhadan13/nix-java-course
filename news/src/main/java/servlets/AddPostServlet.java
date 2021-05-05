@@ -1,6 +1,7 @@
 package servlets;
 
 import dao.PostDao;
+import dao.UserDao;
 import models.Post;
 import models.User;
 
@@ -12,27 +13,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 
 @WebServlet("/addPostServlet")
 public class AddPostServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletContext context = getServletContext();
+        UserDao userDao = new UserDao();
         PostDao postDao = new PostDao();
         String title = req.getParameter("title");
         String text = req.getParameter("text");
         String date = req.getParameter("date");
-        // SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        // DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder().toFormatter(Locale.US);
-        Post post = new Post((long) new SecureRandom().nextInt(), title, text, LocalDate.parse(date), 0,
-                new User((long) new SecureRandom().nextInt(), "Artem", "artem@google.com"), 1L);
-        boolean result = postDao.save(post);
-        // System.out.println(result);
+        User user = new User("testUser", "asdfghjkl", 10, "sample@google.com");
+        userDao.save(user);
+        postDao.save(new Post(title, text, LocalDate.now(), 0, user.getId()));
         RequestDispatcher view = req.getRequestDispatcher("jsp/blog.jsp");
         view.forward(req, resp);
     }

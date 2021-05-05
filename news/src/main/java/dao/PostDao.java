@@ -15,17 +15,20 @@ public class PostDao implements Dao<Post> {
         }
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("INSERT INTO news1 VALUES (?, ?, ?, ?, ?, ?)")) {
-            preparedStatement.setLong(1, post.getId());
-            preparedStatement.setString(2, post.getTitle());
-            preparedStatement.setString(3, post.getText());
-            preparedStatement.setDate(4, Date.valueOf(post.getDate()));
-            preparedStatement.setInt(5, post.getViews());
-            preparedStatement.setLong(6, post.getAuthor().getId());
+                     .prepareStatement("INSERT INTO news1 VALUES (DEFAULT, ?, ?, ?, ?, ?)")) {
+            preparedStatement.setString(1, post.getTitle());
+            preparedStatement.setString(2, post.getText());
+            preparedStatement.setDate(3, Date.valueOf(post.getDate()));
+            preparedStatement.setInt(4, post.getViews());
+            preparedStatement.setLong(5, post.getAuthorId());
 
             int executeUpdateResult = preparedStatement.executeUpdate();
 
             if (executeUpdateResult == 1) {
+                ResultSet resultSet = preparedStatement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    post.setId(resultSet.getLong(1));
+                }
                 return true;
             }
         } catch (SQLException e) {

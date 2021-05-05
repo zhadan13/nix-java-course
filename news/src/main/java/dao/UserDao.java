@@ -15,16 +15,19 @@ public class UserDao implements Dao<User> {
         }
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection
-                     .prepareStatement("INSERT INTO users1 VALUES (?, ?, ?, ?, ?)")) {
-            preparedStatement.setLong(1, user.getId());
-            preparedStatement.setString(2, user.getName());
-            preparedStatement.setString(3, user.getPassword());
-            preparedStatement.setInt(4, user.getAge());
-            preparedStatement.setString(5, user.getEmail());
+                     .prepareStatement("INSERT INTO users1 VALUES (DEFAULT, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, user.getName());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setInt(3, user.getAge());
+            preparedStatement.setString(4, user.getEmail());
 
             int executeUpdateResult = preparedStatement.executeUpdate();
 
             if (executeUpdateResult == 1) {
+                ResultSet resultSet = preparedStatement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    user.setId(resultSet.getLong(1));
+                }
                 return true;
             }
         } catch (SQLException e) {
